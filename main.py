@@ -1,6 +1,6 @@
 import sys
 from store import Store
-from products import Product
+from products import Product, NonStockedProduct, LimitedProduct
 
 
 def display_menu() -> None:
@@ -39,12 +39,14 @@ def get_choice_for_order(products) -> list[tuple]:
     while True:
         try:
             product_choice = input("\nEnter the number of the product: ")
+
             if product_choice == "":
                 break
+
             index = int(product_choice) -1
             product = products[index]
-
             order_amount = input("What amount do you want? ")
+
             if order_amount == "":
                 break
 
@@ -52,9 +54,15 @@ def get_choice_for_order(products) -> list[tuple]:
                 print("Enter an amount over zero!")
                 continue
 
-            if product.get_quantity() < int(order_amount):
-                print(f"Available quantity: {product.get_quantity()}.")
-                continue
+            if type(product) == LimitedProduct:
+                if int(order_amount) > product.get_maximum():
+                    print(f"Only {product.get_maximum()} per order!")
+                    continue
+
+            if type(product) != NonStockedProduct:
+                if product.get_quantity() < int(order_amount):
+                    print(f"Available quantity: {product.get_quantity()}.")
+                    continue
 
             order.append((product, int(order_amount)))
             print("Product added to list!")
@@ -90,10 +98,10 @@ def main():
     """
     try:
         product_list = [Product("MacBook Air M2", price=1450, quantity=100),
-                        Product("Bose QuietComfort Earbuds", price=250,
-                                quantity=500),
+                        Product("Bose QuietComfort Earbuds", price=250, quantity=500),
                         Product("Google Pixel 7", price=500, quantity=250),
-                        Product("N", price=500, quantity=0)
+                        NonStockedProduct("Windows License", price=125),
+                        LimitedProduct(name="Shipping", price= 10, quantity=250, maximum=1)
                         ]
 
         best_buy = Store(product_list)

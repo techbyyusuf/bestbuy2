@@ -84,7 +84,7 @@ class Product:
 
     def show(self):
         """
-        prints name, price and available quantity of product
+        returns string of name, price and available quantity of product
         """
         return f"{self.name}, Price: {self.price}, Quantity: {self.quantity}"
 
@@ -107,3 +107,55 @@ class Product:
 
         print(f"Error while making order. Quantity of {self.name} larger then exists")
         return 0
+
+
+
+#Shipping
+class LimitedProduct(Product):
+    def __init__(self, name, price, quantity, maximum):
+        super().__init__(name, price, quantity)
+
+        if not isinstance(maximum,(float, int)):
+            raise TypeError("Enter a number for maximum amount of quantity!")
+        if maximum <= 0:
+            raise TypeError("Maximum purchase of product has to be over zero!")
+
+        self.maximum = maximum
+
+    def get_maximum(self):
+        return self.maximum
+
+    def show(self):
+        """
+        return string of name, price, available quantity of product, maximum
+        allowed amount of product in order
+        """
+        super().show()
+        return (f"{self.name}, Price: {self.price}, Quantity: {self.quantity}, "
+                f"Maximum: {self.maximum}")
+
+
+    def buy(self, quantity):
+        max_quantity = self.get_maximum()
+        total_price = super().buy(max_quantity)
+        return total_price
+
+
+
+#Windows License
+class NonStockedProduct(Product):
+    def __init__(self, name, price):
+        super().__init__(name, price, quantity=0)
+        self.active = True
+
+
+    def show(self):
+        """
+        returns string of name and price
+        """
+        super().show()
+        return f"{self.name}, Price: {self.price}"
+
+    def buy(self, quantity):
+        total_price = self.price * quantity
+        return total_price
