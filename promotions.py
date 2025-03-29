@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from products import Product
 
 
 class Promotion(ABC):

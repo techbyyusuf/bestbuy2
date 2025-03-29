@@ -111,23 +111,21 @@ class Product:
 
         :param quantity: quantity of product, that is ordered
         """
-        if self._quantity >= quantity:
-            new_quantity = self._quantity - quantity
-            self.set_quantity(new_quantity)
+        if self._quantity < quantity:
+            raise ValueError("Not enough stock.")
 
-            if self._quantity == 0:
-                self.deactivate()
+        if self.get_promotion():
+            total_price = self._promotion.apply_promotion(self, quantity)
+        else:
+            total_price: float = self._price * quantity
 
-            if self.get_promotion():
-                total_price = self._promotion.apply_promotion(self, quantity)
-            else:
-                total_price: float = self._price * quantity
+        new_quantity = self._quantity - quantity
+        self.set_quantity(new_quantity)
 
+        if self._quantity == quantity:
+            self.deactivate()
 
-            return total_price
-
-        print(f"Error while making order. Quantity of {self._name} larger then exists")
-        return 0
+        return total_price
 
 
 
