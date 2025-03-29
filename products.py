@@ -33,34 +33,47 @@ class Product:
         if name == "":
             raise TypeError("Empty names are not allowed!")
 
-        self.name = name
-        self.price = price
-        self.quantity = quantity
-        if quantity == 0:
-            self.active = False
-        else:
-            self.active = True
+        self._name = name
+        self._price = price
+        self._quantity = quantity
+        self._active = True
+
+        self._promotion = None
 
 
     def get_quantity(self) -> int:
         """
         returns quantity of object
         """
-        return self.quantity
+        return self._quantity
 
 
     def activate(self):
         """
         activates product
         """
-        self.active = True
+        self._active = True
 
 
     def deactivate(self):
         """
         deactivates product
         """
-        self.active = False
+        self._active = False
+
+
+    def get_price(self):
+        return self._price
+
+    def get_promotion(self):
+        """
+        returns the instance variable promotion
+        """
+        return self._promotion
+
+
+    def set_promotion(self, promotion):
+        self._promotion = promotion
 
 
     def set_quantity(self, quantity: int):
@@ -69,9 +82,9 @@ class Product:
 
         :param quantity: quantity of product
         """
-        self.quantity = quantity
-        print(f"\nTotal amount of {self.name} is stocked to {self.quantity}.")
-        if self.quantity <= 0:
+        self._quantity = quantity
+        print(f"\nTotal amount of {self._name} is stocked to {self._quantity}.")
+        if self._quantity <= 0:
             self.deactivate()
 
 
@@ -79,14 +92,16 @@ class Product:
         """
         return the variable active to show if product is active or not
         """
-        return self.active
+        return self._active
 
 
     def show(self):
         """
         returns string of name, price and available quantity of product
         """
-        return f"{self.name}, Price: {self.price}, Quantity: {self.quantity}"
+        promotion = self.get_promotion()
+        return (f"{self._name}, Price: {self._price}, "
+                f"Quantity: {self._quantity}, Promotion: {promotion}")
 
 
     def buy(self,  quantity: int) -> float:
@@ -96,16 +111,22 @@ class Product:
 
         :param quantity: quantity of product, that is ordered
         """
-        if self.quantity >= quantity:
-            new_quantity = self.quantity - quantity
+        if self._quantity >= quantity:
+            new_quantity = self._quantity - quantity
             self.set_quantity(new_quantity)
-            total_price: float = self.price * quantity
 
-            if self.quantity == 0:
+            if self._quantity == 0:
                 self.deactivate()
+
+            if self.get_promotion():
+                total_price = self._promotion.apply_promotion(self, quantity)
+            else:
+                total_price: float = self._price * quantity
+
+
             return total_price
 
-        print(f"Error while making order. Quantity of {self.name} larger then exists")
+        print(f"Error while making order. Quantity of {self._name} larger then exists")
         return 0
 
 
@@ -120,19 +141,19 @@ class LimitedProduct(Product):
         if maximum <= 0:
             raise TypeError("Maximum purchase of product has to be over zero!")
 
-        self.maximum = maximum
+        self._maximum = maximum
 
     def get_maximum(self):
-        return self.maximum
+        return self._maximum
 
     def show(self):
         """
         return string of name, price, available quantity of product, maximum
         allowed amount of product in order
         """
-        super().show()
-        return (f"{self.name}, Price: {self.price}, Quantity: {self.quantity}, "
-                f"Maximum: {self.maximum}")
+        promotion = self.get_promotion()
+        return (f"{self._name}, Price: {self._price}, Quantity: {self._quantity}, "
+                f"Maximum: {self._maximum}, Promotion: {promotion}")
 
 
     def buy(self, quantity):
@@ -146,16 +167,22 @@ class LimitedProduct(Product):
 class NonStockedProduct(Product):
     def __init__(self, name, price):
         super().__init__(name, price, quantity=0)
-        self.active = True
+        self._active = True
 
 
     def show(self):
         """
         returns string of name and price
         """
-        super().show()
-        return f"{self.name}, Price: {self.price}"
+        promotion = self.get_promotion()
+        return f"{self._name}, Price: {self._price}, Promotion: {promotion}"
+
+
 
     def buy(self, quantity):
-        total_price = self.price * quantity
+        if self.get_promotion():
+            total_price = self._promotion.apply_promotion(self, quantity)
+        else:
+            total_price: float = self._price * quantity
+
         return total_price

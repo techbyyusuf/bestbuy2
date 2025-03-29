@@ -1,6 +1,7 @@
 import sys
 from store import Store
 from products import Product, NonStockedProduct, LimitedProduct
+import promotions
 
 
 def display_menu() -> None:
@@ -105,6 +106,15 @@ def main():
                         ]
 
         best_buy = Store(product_list)
+
+        second_half_price = promotions.SecondHalfPrice("Second Half Price!")
+        third_one_free = promotions.ThirdOneFree("Third One Free!")
+        thirty_percent = promotions.PercentDiscount("30% off!", percent=30)
+
+        product_list[0].set_promotion(second_half_price)
+        product_list[1].set_promotion(third_one_free)
+        product_list[3].set_promotion(thirty_percent)
+
     except TypeError as e:
         print("Store initialization failed", e)
         sys.exit()

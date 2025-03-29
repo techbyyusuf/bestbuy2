@@ -19,26 +19,26 @@ class Store:
             if not isinstance(product, Product):
                 raise TypeError(f"Invalid item in product list: {product}")
 
-        self.product_list = product_list
+        self._product_list = product_list
 
 
     def add_product(self, product):
         """
         adds new product to list of products
         """
-        if product in self.product_list:
+        if product in self._product_list:
             print(f" {product.name} is already in the store.")
         else:
             print(f"Added {product.name} to the store.")
-            self.product_list.append(product)
+            self._product_list.append(product)
 
 
     def remove_product(self, product):
         """
         removes product from list of products
         """
-        if product in self.product_list:
-            self.product_list.remove(product)
+        if product in self._product_list:
+            self._product_list.remove(product)
             print(f"Removed {product.name} from the store.")
         else:
             print(f"Error: {product.name} is not in the store.")
@@ -48,14 +48,14 @@ class Store:
         """
         returns total quantity of offered products
         """
-        return sum([product.get_quantity() for product in self.product_list])
+        return sum([product.get_quantity() for product in self._product_list])
 
 
     def get_all_products(self) -> list[Product]:
         """
         return list of offered products, that are available
         """
-        return [product for product in self.product_list if product.is_active()]
+        return [product for product in self._product_list if product.is_active()]
 
 
     def order(self, shopping_list: list[tuple]) -> float:
@@ -69,3 +69,5 @@ class Store:
             total_price += product.buy(quantity)
 
         return total_price
+
+
