@@ -15,9 +15,9 @@ def test_create_object_with_empty_name():
     assert "Empty names are not allowed!" in str(e.value)
 
 def test_create_object_with_negative_price():
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError) as e:
         Product(name="N", price=-5, quantity=250)
-    assert "No prices below zero."
+    assert str(e.value) == "No prices below zero."
 
 def test_zero_quantity_product_is_inactive():
     adidas = Product(name="Adidas", price=50.0, quantity=100)

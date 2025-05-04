@@ -63,6 +63,10 @@ class Product:
 
 
     def get_price(self):
+        """
+        returns the price
+
+        """
         return self._price
 
     def get_promotion(self):
@@ -73,6 +77,10 @@ class Product:
 
 
     def set_promotion(self, promotion):
+        """
+        function gets a promotion and sets the instance promotion
+
+        """
         self._promotion = promotion
 
 
@@ -119,8 +127,7 @@ class Product:
         else:
             total_price: float = self._price * quantity
 
-        new_quantity = self._quantity - quantity
-        self.set_quantity(new_quantity)
+        self.set_quantity(self._quantity - quantity)
 
         if self._quantity == quantity:
             self.deactivate()
@@ -131,17 +138,27 @@ class Product:
 
 #Shipping
 class LimitedProduct(Product):
+    """
+    Products that are only allowed to be purchased in a certain amount
+    """
     def __init__(self, name, price, quantity, maximum):
+        """
+        gets name, price, quantity, maximum allowed purchase of prodcut in one
+        order and creates the instances.
+        """
         super().__init__(name, price, quantity)
 
         if not isinstance(maximum,(float, int)):
             raise TypeError("Enter a number for maximum amount of quantity!")
         if maximum <= 0:
-            raise TypeError("Maximum purchase of product has to be over zero!")
+            raise ValueError("Maximum purchase of product has to be over zero!")
 
         self._maximum = maximum
 
     def get_maximum(self):
+        """
+        returns the maximum available amount
+        """
         return self._maximum
 
     def show(self):
@@ -155,15 +172,26 @@ class LimitedProduct(Product):
 
 
     def buy(self, quantity):
+        """
+        gets the quantity of purchased product, decrease the amount of product
+        and return the total price of order
+        """
         max_quantity = self.get_maximum()
-        total_price = super().buy(max_quantity)
+        allowed_quantity = min(quantity, max_quantity)
+        total_price = super().buy(allowed_quantity)
         return total_price
-
 
 
 #Windows License
 class NonStockedProduct(Product):
+    """
+    Products that are not stocked
+    """
+
     def __init__(self, name, price):
+        """
+        gets name and price of non-stocked Product and sets the instances
+        """
         super().__init__(name, price, quantity=0)
         self._active = True
 
@@ -178,6 +206,10 @@ class NonStockedProduct(Product):
 
 
     def buy(self, quantity):
+        """
+        gets the quantity, checks if the product has a promotion. If it has
+        a promotion applies the promotion and return the total price.
+        """
         if self.get_promotion():
             total_price = self._promotion.apply_promotion(self, quantity)
         else:

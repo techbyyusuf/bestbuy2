@@ -24,24 +24,25 @@ class Store:
 
     def add_product(self, product):
         """
-        adds new product to list of products
+        Adds a new product to the list of products, if it's not already there (by name)
         """
-        if product in self._product_list:
-            print(f" {product.name} is already in the store.")
+        if any(p.name == product.name for p in self._product_list):
+            print(f"{product.name} is already in the store.")
         else:
-            print(f"Added {product.name} to the store.")
             self._product_list.append(product)
+            print(f"Added {product.name} to the store.")
 
 
     def remove_product(self, product):
         """
-        removes product from list of products
+        Removes a product from the list by matching the name
         """
-        if product in self._product_list:
-            self._product_list.remove(product)
-            print(f"Removed {product.name} from the store.")
-        else:
-            print(f"Error: {product.name} is not in the store.")
+        for p in self._product_list:
+            if p.name == product.name:
+                self._product_list.remove(p)
+                print(f"Removed {product.name} from the store.")
+                return
+        print(f"Error: {product.name} is not in the store.")
 
 
     def get_total_quantity(self) -> int:
